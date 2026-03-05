@@ -2,15 +2,24 @@
 <resources>
     <string name="app_name">SimpleCalculator</string>
     <string name="result_zero">0</string>
-    <string name="btn_ac">AC</string>
+
+    <!-- Кнопки памяти -->
+    <string name="btn_mc">MC</string>
+    <string name="btn_mplus">M+</string>
+    <string name="btn_mminus">M−</string>
+    <string name="btn_mr">MR</string>
+
+    <!-- Основные кнопки -->
+    <string name="btn_ac">C</string>
+    <string name="btn_backspace">⌫</string>
     <string name="btn_sign">+/-</string>
     <string name="btn_percent">%</string>
     <string name="btn_divide">÷</string>
     <string name="btn_multiply">×</string>
-    <string name="btn_subtract">-</string>
+    <string name="btn_subtract">−</string>
     <string name="btn_add">+</string>
     <string name="btn_equals">=</string>
-    <string name="btn_dot">,</string>
+    <string name="btn_comma">,</string>
     <string name="btn_0">0</string>
     <string name="btn_1">1</string>
     <string name="btn_2">2</string>
@@ -22,7 +31,7 @@
     <string name="btn_8">8</string>
     <string name="btn_9">9</string>
 
-    <!-- Content descriptions for accessibility -->
+    <!-- Content descriptions для доступности -->
     <string name="desc_btn_0">Кнопка 0</string>
     <string name="desc_btn_1">Кнопка 1</string>
     <string name="desc_btn_2">Кнопка 2</string>
@@ -33,13 +42,21 @@
     <string name="desc_btn_7">Кнопка 7</string>
     <string name="desc_btn_8">Кнопка 8</string>
     <string name="desc_btn_9">Кнопка 9</string>
+
     <string name="desc_btn_add">Кнопка плюс</string>
     <string name="desc_btn_sub">Кнопка минус</string>
     <string name="desc_btn_mult">Кнопка умножить</string>
     <string name="desc_btn_div">Кнопка разделить</string>
     <string name="desc_btn_equal">Кнопка равно</string>
-    <string name="desc_btn_dot">Кнопка запятая</string>
+    <string name="desc_btn_comma">Кнопка запятая</string>
     <string name="desc_btn_clear">Кнопка очистка</string>
-    <string name="desc_btn_sign">Кнопка смена знака</string>
-    <string name="desc_btn_percent">Кнопка процент</string>
+    <string name="desc_btn_backspace">Кнопка удаления символа</string>
+    <string name="desc_btn_sign">Кнопка смены знака</string>
+    <string name="desc_btn_percent">Кнопка процента</string>
+
+    <!-- Описания кнопок памяти -->
+    <string name="desc_btn_mc">Очистить память</string>
+    <string name="desc_btn_mplus">Добавить в память</string>
+    <string name="desc_btn_mminus">Вычесть из памяти</string>
+    <string name="desc_btn_mr">Восстановить из памяти</string>
 </resources>

@@ -8,20 +8,19 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.button.MaterialButton;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView tvResult;
 
-    // Переменные состояния
-    private String currentInput = "0";       // Текущее вводимое число (справа)
-    private Double firstOperand = null;      // Первое число
-    private String operator = null;          // Знак операции
-    private boolean isNewOperation = true;   // Флаг начала новой операции
-
-    // Новая переменная для хранения полного выражения (например: "5 + ")
+    private String currentInput = "0";
+    private Double firstOperand = null;
+    private String operator = null;
+    private boolean isNewOperation = true;
     private String currentExpression = "";
+
+    // Переменная для памяти
+    private double memoryValue = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +28,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         tvResult = findViewById(R.id.tvResult);
-        updateDisplay(); // Инициализируем экран
+
+        updateDisplay();
 
         // Навешиваем обработчики на все кнопки
         int[] btnIds = {
                 R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4,
                 R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9,
                 R.id.btnAdd, R.id.btnSub, R.id.btnMult, R.id.btnDiv,
-                R.id.btnEqual, R.id.btnDot, R.id.btnClear, R.id.btnSign, R.id.btnPercent
+                R.id.btnEqual, R.id.btnComma, R.id.btnClear, R.id.btnPercent,
+                R.id.btnMC, R.id.btnMPlus, R.id.btnMMinus, R.id.btnMR, R.id.btnBackspace
         };
 
         for (int id : btnIds) {
@@ -46,34 +47,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        MaterialButton button = (MaterialButton) v;
-        String text = button.getText().toString();
+        int id = v.getId();
 
-        switch (text) {
-            case "AC":
-                actionClear();
-                break;
-            case "+/-":
-                actionSignChange();
-                break;
-            case "%":
-                actionPercent();
-                break;
-            case "÷":
-            case "×":
-            case "-":
-            case "+":
-                actionOperator(text);
-                break;
-            case "=":
-                actionEquals();
-                break;
-            case ",":
-                actionDot();
-                break;
-            default:
-                actionNumber(text);
-                break;
+        // Цифровые кнопки
+        if (id == R.id.btn0) {
+            actionNumber("0");
+        } else if (id == R.id.btn1) {
+            actionNumber("1");
+        } else if (id == R.id.btn2) {
+            actionNumber("2");
+        } else if (id == R.id.btn3) {
+            actionNumber("3");
+        } else if (id == R.id.btn4) {
+            actionNumber("4");
+        } else if (id == R.id.btn5) {
+            actionNumber("5");
+        } else if (id == R.id.btn6) {
+            actionNumber("6");
+        } else if (id == R.id.btn7) {
+            actionNumber("7");
+        } else if (id == R.id.btn8) {
+            actionNumber("8");
+        } else if (id == R.id.btn9) {
+            actionNumber("9");
+        }
+        // Операторы
+        else if (id == R.id.btnAdd) {
+            actionOperator("+");
+        } else if (id == R.id.btnSub) {
+            actionOperator("-");
+        } else if (id == R.id.btnMult) {
+            actionOperator("×");
+        } else if (id == R.id.btnDiv) {
+            actionOperator("÷");
+        }
+        // Другие кнопки
+        else if (id == R.id.btnEqual) {
+            actionEquals();
+        } else if (id == R.id.btnComma) {
+            actionDot();
+        } else if (id == R.id.btnClear) {
+            actionClear();
+        } else if (id == R.id.btnPercent) {
+            actionPercent();
+        } else if (id == R.id.btnBackspace) {
+            actionBackspace();
+        } else if (id == R.id.btnMC) {
+            actionMemoryClear();
+        } else if (id == R.id.btnMPlus) {
+            actionMemoryAdd();
+        } else if (id == R.id.btnMMinus) {
+            actionMemorySubtract();
+        } else if (id == R.id.btnMR) {
+            actionMemoryRecall();
         }
     }
 
@@ -83,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isNewOperation) {
             currentInput = "0";
             isNewOperation = false;
-            // Если мы начинаем ввод нового числа после результата, сбрасываем выражение
             if (operator == null) {
                 currentExpression = "";
             }
@@ -119,17 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateDisplay();
     }
 
-    private void actionSignChange() {
-        if (!currentInput.equals("0")) {
-            if (currentInput.startsWith("-")) {
-                currentInput = currentInput.substring(1);
-            } else {
-                currentInput = "-" + currentInput;
-            }
-            updateDisplay();
-        }
-    }
-
     private void actionPercent() {
         try {
             double value = parseDouble(currentInput);
@@ -142,19 +156,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void actionOperator(String op) {
-        // Если уже была операция и пользователь ввел второе число -> считаем промежуточный итог
         if (firstOperand != null && !isNewOperation) {
             double secondOperand = parseDouble(currentInput);
             double result = calculate(firstOperand, secondOperand, operator);
 
-            // Обновляем первое число результатом
             firstOperand = result;
             currentInput = formatDouble(result);
-
-            // Формируем новое выражение: "Результат + НовыйОператор"
             currentExpression = formatDouble(result) + " " + op + " ";
         } else {
-            // Первый раз нажали оператор
             firstOperand = parseDouble(currentInput);
             currentExpression = currentInput + " " + op + " ";
         }
@@ -172,17 +181,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         double secondOperand = parseDouble(currentInput);
         double result = calculate(firstOperand, secondOperand, operator);
 
-        // Формируем полную строку: "Число1 Оператор Число2 = Результат"
         String fullExpression = currentExpression + currentInput + " = " + formatDouble(result);
 
         tvResult.setText(fullExpression);
 
-        // Подготовка к следующему действию
         currentInput = formatDouble(result);
         firstOperand = null;
         operator = null;
-        currentExpression = ""; // Сбрасываем выражение, так как расчет завершен
+        currentExpression = "";
         isNewOperation = true;
+    }
+
+    // Метод для backspace (удаление последнего символа)
+    private void actionBackspace() {
+        if (!currentInput.equals("0")) {
+            if (currentInput.length() == 1 ||
+                    (currentInput.length() == 2 && currentInput.startsWith("-"))) {
+                currentInput = "0";
+            } else {
+                currentInput = currentInput.substring(0, currentInput.length() - 1);
+            }
+            updateDisplay();
+        }
+    }
+
+    // Кнопки памяти
+    private void actionMemoryClear() {
+        memoryValue = 0;
+        Toast.makeText(this, "Память очищена", Toast.LENGTH_SHORT).show();
+    }
+
+    private void actionMemoryAdd() {
+        try {
+            double value = parseDouble(currentInput);
+            memoryValue += value;
+            Toast.makeText(this, "M+ = " + formatDouble(memoryValue), Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException e) {
+            // Игнорируем
+        }
+    }
+
+    private void actionMemorySubtract() {
+        try {
+            double value = parseDouble(currentInput);
+            memoryValue -= value;
+            Toast.makeText(this, "M- = " + formatDouble(memoryValue), Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException e) {
+            // Игнорируем
+        }
+    }
+
+    private void actionMemoryRecall() {
+        currentInput = formatDouble(memoryValue);
+        isNewOperation = true;
+        updateDisplay();
     }
 
     // Вспомогательный метод для вычислений
@@ -206,15 +258,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressLint("SetTextI18n")
     private void updateDisplay() {
         if (operator != null && !isNewOperation) {
-            // Если операция выбрана и мы вводим второе число, показываем: "Выражение + ТекущееЧисло"
-            // Пример: "5 + 2"
             tvResult.setText(currentExpression + currentInput);
         } else if (operator != null) {
-            // Если операция выбрана, но ввод еще не начался (сразу после нажатия знака)
-            // Показываем только выражение: "5 + "
             tvResult.setText(currentExpression);
         } else {
-            // Просто вводим число
             tvResult.setText(currentInput);
         }
     }
